@@ -1,0 +1,30 @@
+- name: Set Scap Security Guide Variable
+  shell: git ls-remote --tags --ref --sort v:refname https://github.com/ComplianceAsCode/content.git | grep -Pio '(\d+(\.)){2}[\w\.-][\d+]' | tail -1
+  register: SSG_VERSION
+
+- name: Set Scap Security Guide Variable
+  shell: hostname
+  register: hostname
+
+- name: Set Scap Security Guide Variable
+  debug:
+    msg: "SSG: {{ SSG_VERSION.stdout }} on {{ hostname.stdout }}"
+
+
+- name: Set Scap Security Guide Variable
+  shell: |
+    if [ -n {{ SSG_VERSION.stdout }} ]; then
+      # Download Most Recent Security Guide
+      sudo wget https://github.com/ComplianceAsCode/content/releases/download/v{{ SSG_VERSION.stdout }}/scap-security-guide-{{ SSG_VERSION.stdout }}.zip -O ssg.zip
+      sudo unzip -jo ssg.zip "scap-security-guide-{{ SSG_VERSION.stdout }}/*" -d ssg
+
+      # Scan CIS Level 1 Profile
+      sudo oscap xccdf eval --profile xccdf_org.ssgproject.content_profile_cis_level1_server --results /home/ubuntu/oscap-results.xml ./ssg/ssg-ubuntu2204-ds.xml
+
+      # Generate a Scan Report
+      sudo oscap xccdf generate report /home/ubuntu/oscap-results.xml > /home/ubuntu/oscap-results-ansible.html
+    fi
+
+- name: Set permission owner to ubuntu
+  shell: |
+    sudo chown ubuntu:ubuntu /home/ubuntu/oscap-results.xml /home/ubuntu/oscap-results-ansible.html

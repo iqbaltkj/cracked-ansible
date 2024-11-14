@@ -1,0 +1,2 @@
+- name: Scan Openscap
+  include_tasks: scan.yml

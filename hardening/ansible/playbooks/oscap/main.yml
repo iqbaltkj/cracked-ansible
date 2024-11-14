@@ -1,0 +1,11 @@
+- name: Openscap Installation
+  hosts: all
+  gather_facts: no
+  roles:
+  - oscap_installation
+
+- name: Openscap Scanning
+  hosts: all
+  gather_facts: no
+  roles:
+  - oscap_scan_ubuntu20

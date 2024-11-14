@@ -1,0 +1,13 @@
+- name: Update apt cache
+  become: true
+  apt:
+    update_cache: yes
+
+- name: Install Openscap and related packages
+  become: true
+  apt:
+    name: "{{ item }}"
+  loop:
+  - "libopenscap8"
+  - "git"
+  - "unzip"
